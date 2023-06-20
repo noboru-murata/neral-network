@@ -1,1 +1,22 @@
 * neural-network
+
+It has been proved from various points of view that the neural network
+is a universal function approximator that can approximate arbitrary
+nonlinear functions sufficiently well. We clarify the class of
+functions that can be represented by the neural network based on the
+integral representation (Ridgelet transform), and investigate the
+relationship between the accuracy of approximation by finite sums and
+the integral representation.
+
+#+begin_quote
+Murata, N.:
+"An integral representation of functions using three-layered networks and their approximation bounds",
+/Neural Networks/,
+Volume 9, Issue 6, August 1996, Pages 947-956.
+[[https://doi.org/10.1016/0893-6080(96)00000-7]]
+
+Sonoda S., Murata, N.
+/Applied and Computational Harmonic Analysis/
+Volume 43, Issue 2, September 2017, Pages 233-268
+[[https://doi.org/10.1016/j.acha.2015.12.005]]
+#+end_quote

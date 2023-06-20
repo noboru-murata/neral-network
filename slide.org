@@ -3,7 +3,7 @@
 #+AUTHOR: Noboru Murata
 #+EMAIL: noboru.murata@gmail.com
 #+DATE: \today
-#+DESCRIPTION: based on N. Murata & Amari 1999, doi:10.1016/S0165-1684(98)00206-0
+#+DESCRIPTION: based on N. Murata (1996), doi:10.1016/0893-6080(96)00000-7
 #+KEYWORDS: multiple spike trains, stochastic modeling, graph inference
 #+LANGUAGE: en
 #+STARTUP: beamer hidestars content indent
@@ -20,7 +20,7 @@
 #+BEAMER_HEADER: \usepackage[toc=none]{mytalk}
 # #+BEAMER_HEADER: \usepackage[toc=none,font=heavy]{mytalk}
 #+BEAMER_HEADER: \addbibresource{papers.bib}
-#+BEAMER_HEADER: \graphicspath{{figs/},{figs/pnas/},{refs/}}
+#+BEAMER_HEADER: \graphicspath{{figs/}{refs/}}
 #+BEAMER_HEADER: \DeclareGraphicsExtensions{.pdf,.png,.eps,.jpg}
 #+BEAMER_HEADER: \institute{\url{https://noboru-murata.github.io/}}
 # #+BEAMER_HEADER: \institute[WASEDA]{Waseda University\\\url{https://noboru-murata.github.io/}}

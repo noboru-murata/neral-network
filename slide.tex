@@ -1,4 +1,4 @@
-% Created 2023-06-20 Tue 15:45
+% Created 2023-06-20 Tue 18:00
 % Intended LaTeX compiler: pdflatex
 \documentclass[fleqn,aspectratio=1610]{beamer}
 \author{Noboru Murata}
@@ -7,14 +7,14 @@
 \subtitle{integral representaion and approximation bound}
 \usepackage[toc=none]{mytalk}
 \addbibresource{papers.bib}
-\graphicspath{{figs/},{figs/pnas/},{refs/}}
+\graphicspath{{figs/}{refs/}}
 \DeclareGraphicsExtensions{.pdf,.png,.eps,.jpg}
 \institute{\url{https://noboru-murata.github.io/}}
 \hypersetup{
  pdfauthor={Noboru Murata},
  pdftitle={Universality of Multi-Layer Perceptron},
  pdfkeywords={multiple spike trains, stochastic modeling, graph inference},
- pdfsubject={based on N. Murata \& Amari 1999, https://doi.org/10.1016/S0165-1684(98)00206-0},
+ pdfsubject={based on N. Murata (1996), https://doi.org/10.1016/0893-6080(96)00000-7},
  pdfcreator={Emacs 28.2 (Org mode 9.6.4)}, 
  pdflang={English}}
 \begin{document}
@@ -26,10 +26,10 @@
 
 
 \section{Introduction}
-\label{sec:org25f52e9}
+\label{sec:org0a95d8f}
 \subsection{mathematical model of neuron}
-\label{sec:orgcd3e974}
-\begin{frame}[label={sec:orge5d91fa}]{Specification of Brain}
+\label{sec:org249b258}
+\begin{frame}[label={sec:orgf1d1d5c}]{Specification of Brain}
 \begin{columns}
 \begin{column}{0.57\columnwidth}
 \begin{center}
@@ -62,7 +62,7 @@ ten times of neurons
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:org0a63046},t]{Mathematical Model}
+\begin{frame}[label={sec:orgaf53fcc},t]{Mathematical Model}
 output
 \begin{center}
 \includegraphics[width=.5\textwidth]{neuron_model}
@@ -77,7 +77,7 @@ output
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org50dcb60},t]{Mathematical Model}
+\begin{frame}[label={sec:org5823c56},t]{Mathematical Model}
 internal state
 \begin{center}
 \includegraphics[width=.5\textwidth]{neuron_model}
@@ -92,7 +92,7 @@ internal state
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org287f67b},t]{Mathematical Model}
+\begin{frame}[label={sec:org1fd6b73},t]{Mathematical Model}
 activation
 \begin{center}
 \includegraphics[width=.5\textwidth]{neuron_model}
@@ -114,7 +114,7 @@ activation
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:org570eb31},t]{Mathematical Model}
+\begin{frame}[label={sec:orgcb07f0f},t]{Mathematical Model}
 activation
 input-output
 \begin{center}
@@ -130,8 +130,8 @@ input-output
 \end{frame}
 
 \subsection{artificial neural network}
-\label{sec:org2d9da95}
-\begin{frame}[label={sec:orgc943a0f}]{Three-Layered Perceptron}
+\label{sec:org2758442}
+\begin{frame}[label={sec:org76b7fbc}]{Three-Layered Perceptron}
 \begin{columns}
 \begin{column}{0.45\columnwidth}
 \begin{center}
@@ -158,7 +158,7 @@ consists of mathematical neurons
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:org0b8b817}]{Pros of Neural Network}
+\begin{frame}[label={sec:orgefb2e11}]{Pros of Neural Network}
 \begin{itemize}
 \item easily implemented on computers because of
 homogeneously structured simple units
@@ -173,10 +173,10 @@ important information of data inside networks
 \end{frame}
 
 \section{Problem Formulation}
-\label{sec:org31f5295}
+\label{sec:orgb0eb842}
 \subsection{universarity of three-layered perceptron}
-\label{sec:orgdd8d47a}
-\begin{frame}[label={sec:org1ddb07d}]{Universarity of Three-Layered Perceptron}
+\label{sec:orgfdf93b6}
+\begin{frame}[label={sec:orgaa495c4}]{Universarity of Three-Layered Perceptron}
 \begin{alertblock}{Question}
 Find which class of functions can be well approximated by
 three layered perceptron with \(m\)-dim input and \(1\)-dim output:
@@ -186,7 +186,7 @@ three layered perceptron with \(m\)-dim input and \(1\)-dim output:
 \end{alertblock}
 \end{frame}
 
-\begin{frame}[label={sec:org1b83181}]{Ridge Function}
+\begin{frame}[label={sec:orge28338f}]{Ridge Function}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{center}
@@ -196,7 +196,7 @@ a ridge function on \(R^{2}\)
 \end{column}
 
 \begin{column}{0.5\columnwidth}
-\begin{definition}[ridge function]\label{sec:orgd69b418}
+\begin{definition}[ridge function]\label{sec:orga3ac70d}
 A function which is decribed with
 a vector \(\boldsymbol{a}\in R^{m}\), a scalar \(b\in R\),
 and a function \(G:R\to R\) as
@@ -209,7 +209,7 @@ is called \alert{ridge function}.
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:orgdc1fcd5}]{Dual Kernels}
+\begin{frame}[label={sec:orgb8a3e0a}]{Dual Kernels}
 \alert{admissibility condition} and \alert{transformation}
 \begin{itemize}
 \item suppose two functions \(\phi_{d},\phi_{c}\in L^{1}(R)\cap
@@ -230,7 +230,7 @@ where \(\hat\cdot\) denotes Fourier transform.
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orgdb5b70f}]{Example of Kernels}
+\begin{frame}[label={sec:org98816b7}]{Example of Kernels}
 \alert{kernel for composition}\\[0pt]
 (combination of sigmoid functions)
 \begin{align}
@@ -267,7 +267,7 @@ where \(\hat\cdot\) denotes Fourier transform.
 \end{align}
 \end{frame}
 
-\begin{frame}[label={sec:orge18f2a8}]{Example of Kernels}
+\begin{frame}[label={sec:orgaa42202}]{Example of Kernels}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{center}
@@ -286,8 +286,8 @@ kernel for decomposition: \(\phi_d\) \\[0pt]
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:org178c0dd}]{Integral Representation with Ridge Function}
-\begin{theorem}[NM 1996]\label{sec:orgbb1dc29}
+\begin{frame}[label={sec:orgdbab0c7}]{Integral Representation with Ridge Function}
+\begin{theorem}[NM 1996]\label{sec:org52e8849}
 With transform \(T\) 
 \begin{equation}
   T(\boldsymbol{a},b)
@@ -406,8 +406,8 @@ where
 \end{frame}
 
 \subsection{approximation bound}
-\label{sec:org16f9af0}
-\begin{frame}[label={sec:orgc1a227f}]{Approximation Bound of Finite Units}
+\label{sec:org6ff38e3}
+\begin{frame}[label={sec:org8cec911}]{Approximation Bound of Finite Units}
 \begin{alertblock}{Question}
 Suppose a function \(f\) is represented by a transform \(T\) as
 \begin{equation}
@@ -423,7 +423,7 @@ Evaluate the accuracy of a finte sum of \(\phi_c\)
 \end{alertblock}
 \end{frame}
 
-\begin{frame}[label={sec:org86ec0f6}]{Assessment of Approximation}
+\begin{frame}[label={sec:org1231d37}]{Assessment of Approximation}
 \begin{itemize}
 \item a function \(f\) is represented by a transform \(T\) as
 \begin{equation}
@@ -447,8 +447,8 @@ evaluate the approximation by \(n\) units with the following norm:
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orgaa3c197}]{Approximation Bound}
-\begin{theorem}[NM 1996]\label{sec:org0bdf9fa}
+\begin{frame}[label={sec:orgb68effa}]{Approximation Bound}
+\begin{theorem}[NM 1996]\label{sec:org46171d4}
 Suppose a function \(f\) is represented by a transform \(T\) as
 \begin{equation}
   f(x)=\int
@@ -466,7 +466,7 @@ which satisfies
 \end{theorem}
 \end{frame}
 
-\begin{frame}[label={sec:orgde7883b}]{Approximation in Function Space (\(\|T\|_{L^1}<C\))}
+\begin{frame}[label={sec:orga5a7502}]{Approximation in Function Space (\(\|T\|_{L^1}<C\))}
 \begin{center}
 \includegraphics<1>[height=.8\textheight]{fn_approx0}%
 \includegraphics<2>[height=.8\textheight]{fn_approx1}%
@@ -534,7 +534,7 @@ in the following discussion, assume \(|\phi_{c}|<1\).
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orgcbee920}]{Approximation Bound and Smoothness}
+\begin{frame}[label={sec:org3b7d31e}]{Approximation Bound and Smoothness}
 \begin{center}
 example of function spaces with \(O(1/n)\)-rate convergence 
 \end{center}
@@ -576,8 +576,8 @@ example of function spaces with \(O(1/n)\)-rate convergence
 \end{frame}
 
 \subsection{approximation error}
-\label{sec:org59edcc3}
-\begin{frame}[label={sec:orge1a828d}]{Learning from Examples}
+\label{sec:org1ddbfe9}
+\begin{frame}[label={sec:orgf5723c7}]{Learning from Examples}
 \begin{itemize}
 \item \alert{aim:} minimize approximation errors of
 a contaminated function \(y=f(\boldsymbol{x})+\xi\) 
@@ -603,7 +603,7 @@ a contaminated function \(y=f(\boldsymbol{x})+\xi\)
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org93dff15}]{Structural Error}
+\begin{frame}[label={sec:org05da54f}]{Structural Error}
 \begin{itemize}
 \item errors caused by model structure:
 \begin{align}
@@ -621,7 +621,7 @@ where \(\sigma^{2}\) is the variance of an additive noise \(\xi\).
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orgcdaf5d3}]{Learning Error}
+\begin{frame}[label={sec:org1bb1f72}]{Learning Error}
 \begin{itemize}
 \item errors caused by training from examples:
 \begin{align}
@@ -648,8 +648,8 @@ are given by using the partial derivative with respect to the
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org192272b}]{Error Bound}
-\begin{theorem}[]\label{sec:org732e9b3}
+\begin{frame}[label={sec:org9b868d5}]{Error Bound}
+\begin{theorem}[]\label{sec:org735c305}
 The squared error of three-layered perceptron
 is asymptotically bound by
 \begin{align}
@@ -665,8 +665,8 @@ with probability \(1-\delta\).
 \end{frame}
 
 \section{Conclusion}
-\label{sec:org8861d2f}
-\begin{frame}[label={sec:org1955a8e}]{Concluding Remarks}
+\label{sec:org817db96}
+\begin{frame}[label={sec:org28d5b53}]{Concluding Remarks}
 we have investigated
 \begin{itemize}
 \item integral representation of three-layered perceptron
