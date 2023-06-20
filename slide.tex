@@ -1,0 +1,687 @@
+% Created 2023-06-20 Tue 15:45
+% Intended LaTeX compiler: pdflatex
+\documentclass[fleqn,aspectratio=1610]{beamer}
+\author{Noboru Murata}
+\date{\today}
+\title{Universality of Multi-Layer Perceptron}
+\subtitle{integral representaion and approximation bound}
+\usepackage[toc=none]{mytalk}
+\addbibresource{papers.bib}
+\graphicspath{{figs/},{figs/pnas/},{refs/}}
+\DeclareGraphicsExtensions{.pdf,.png,.eps,.jpg}
+\institute{\url{https://noboru-murata.github.io/}}
+\hypersetup{
+ pdfauthor={Noboru Murata},
+ pdftitle={Universality of Multi-Layer Perceptron},
+ pdfkeywords={multiple spike trains, stochastic modeling, graph inference},
+ pdfsubject={based on N. Murata \& Amari 1999, https://doi.org/10.1016/S0165-1684(98)00206-0},
+ pdfcreator={Emacs 28.2 (Org mode 9.6.4)}, 
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+\begin{frame}{Outline}
+\tableofcontents
+\end{frame}
+
+
+\section{Introduction}
+\label{sec:org25f52e9}
+\subsection{mathematical model of neuron}
+\label{sec:orgcd3e974}
+\begin{frame}[label={sec:orge5d91fa}]{Specification of Brain}
+\begin{columns}
+\begin{column}{0.57\columnwidth}
+\begin{center}
+\includegraphics[width=\linewidth]{800px-Sobo_1909_624}
+\\[10pt]
+\end{center}
+\scriptsize
+An anatomical illustration from Sobotta's Human Anatomy 1908
+\end{column}
+\begin{column}{0.43\columnwidth}
+\begin{itemize}
+\item weight: 1400g (2-3\% of body)
+\item neurons:
+\begin{itemize}
+\item cerebrum -- \(1.4 \times 10^{10}\)
+\item cerebellum -- \(1.0 \times 10^{11}\)
+\end{itemize}
+\item neuroglia: \\[0pt]
+ten times of neurons
+\item synapses: \\[0pt]
+\(10^{3}\) -- \(10^{5}\) per neuron
+\item energy consumption: 
+\begin{itemize}
+\item blood -- 15\%
+\item oxygen -- 20\%
+\item dextrose -- 25\%
+\end{itemize}
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[label={sec:org0a63046},t]{Mathematical Model}
+output
+\begin{center}
+\includegraphics[width=.5\textwidth]{neuron_model}
+\end{center}
+\begin{itemize}
+\item output: pulses from 0Hz to 500Hz
+\item normalize
+\begin{itemize}
+\item max frequency: 500Hz \(\mapsto1\)
+\item min frequency: 0Hz \(\mapsto0\)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label={sec:org50dcb60},t]{Mathematical Model}
+internal state
+\begin{center}
+\includegraphics[width=.5\textwidth]{neuron_model}
+\end{center}
+\begin{itemize}
+\item input from other neuron: \(x_i\)
+\item strength of synapse: \(w_i\)
+\item internal state: \alert{weighted sum of inputs}
+\begin{equation}
+  u=\sum_{i} w_i x_i
+\end{equation}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label={sec:org287f67b},t]{Mathematical Model}
+activation
+\begin{center}
+\includegraphics[width=.5\textwidth]{neuron_model}
+\end{center}
+\begin{columns}
+\begin{column}{0.7\columnwidth}
+\begin{itemize}
+\item output a pulse when the internal state exceeds a certain constant:\\[0pt]
+\alert{thresholding}
+\item range from 0 to 1:\\[0pt]
+\alert{non-linear transformation}
+\end{itemize}
+\end{column}
+\begin{column}{0.3\columnwidth}
+\begin{center}
+\includegraphics[width=\textwidth]{sigmoid}
+\end{center}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[label={sec:org570eb31},t]{Mathematical Model}
+activation
+input-output
+\begin{center}
+\includegraphics[width=.5\textwidth]{neuron_model}
+\end{center}
+\begin{align}
+  y=&\psi\left(\sum_{i=1}^{m}w_ix_i-\theta\right)
+      \qquad\text{(model of a neuron)}\\
+    &\quad y: \text{output}\\
+    &\quad \theta: \text{threshold}\\
+    &\quad \psi: \text{activation function}
+\end{align}
+\end{frame}
+
+\subsection{artificial neural network}
+\label{sec:org2d9da95}
+\begin{frame}[label={sec:orgc943a0f}]{Three-Layered Perceptron}
+\begin{columns}
+\begin{column}{0.45\columnwidth}
+\begin{center}
+\unitlength=0.01\textwidth
+\begin{picture}(100,120)
+  \put(50,5){\makebox(0,0){input \(\boldsymbol{x}\)}}
+  \put(50,115){\makebox(0,0){output \(\boldsymbol{y}\)}}
+  \put(50,10){\makebox(0,0)[b]
+    {\includegraphics[height=100\unitlength]{neural}}}
+\end{picture}
+\end{center}
+\end{column}
+\begin{column}{0.55\columnwidth}
+a simple calculation system
+consists of mathematical neurons
+\begin{equation}
+  \begin{split}
+    y_i=\sum_{j=1}^hc_{ij}\psi\left(\sum_{k=1}^{m}a_{jk}x_k-b_j\right),\\
+    (i=1,\dotsc,l)
+  \end{split}
+\end{equation}
+(\(m\)-dim input, \(1\)-dim output)
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[label={sec:org0b8b817}]{Pros of Neural Network}
+\begin{itemize}
+\item easily implemented on computers because of
+homogeneously structured simple units
+\item simple and fast learning algorithms\\[0pt]
+(error-backpropagation: gradient method calculated via chain rule)
+\item size of units and structure of network can be roughly
+designed without detailed prior knowledges
+\item learning from examples sometimes gives
+a unexpected result, which may include
+important information of data inside networks
+\end{itemize}
+\end{frame}
+
+\section{Problem Formulation}
+\label{sec:org31f5295}
+\subsection{universarity of three-layered perceptron}
+\label{sec:orgdd8d47a}
+\begin{frame}[label={sec:org1ddb07d}]{Universarity of Three-Layered Perceptron}
+\begin{alertblock}{Question}
+Find which class of functions can be well approximated by
+three layered perceptron with \(m\)-dim input and \(1\)-dim output:
+\begin{equation}
+  y=\sum_{j=1}^hc_{j}\psi\left(\sum_{k=1}^{m}a_{jk}x_k-b_j\right).
+\end{equation}
+\end{alertblock}
+\end{frame}
+
+\begin{frame}[label={sec:org1b83181}]{Ridge Function}
+\begin{columns}
+\begin{column}{0.5\columnwidth}
+\begin{center}
+\includegraphics[width=.9\linewidth]{ridge_fn}\\[0pt]
+a ridge function on \(R^{2}\)
+\end{center}
+\end{column}
+
+\begin{column}{0.5\columnwidth}
+\begin{definition}[ridge function]\label{sec:orgd69b418}
+A function which is decribed with
+a vector \(\boldsymbol{a}\in R^{m}\), a scalar \(b\in R\),
+and a function \(G:R\to R\) as
+\begin{equation}
+  F(\boldsymbol{x})=G(\boldsymbol{a}\cdot\boldsymbol{x}-b)
+\end{equation}
+is called \alert{ridge function}.
+\end{definition}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[label={sec:orgdc1fcd5}]{Dual Kernels}
+\alert{admissibility condition} and \alert{transformation}
+\begin{itemize}
+\item suppose two functions \(\phi_{d},\phi_{c}\in L^{1}(R)\cap
+  L^{2}(R)\) are bounded, and the following integral exists:
+\begin{equation}
+  \int_{R^{m}}|\omega|^{-m}
+  \hat\phi_{d}(\omega)\hat\phi_{c}(\omega)d\omega=1%(2\pi)^{-m}
+\end{equation}
+
+where \(\hat\cdot\) denotes Fourier transform.
+\item define a transformation of \(f\) with \(\phi_{d}\) by
+\begin{equation}
+  T(\boldsymbol{a},b)
+  =\frac{1}{(2\pi)^{m}}
+  \int_{R^{m}}\phi_{d}(\boldsymbol{a}\cdot\boldsymbol{x}-b)
+  f(\boldsymbol{x})d\boldsymbol{x}
+\end{equation}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label={sec:orgdb5b70f}]{Example of Kernels}
+\alert{kernel for composition}\\[0pt]
+(combination of sigmoid functions)
+\begin{align}
+  \phi_{c}(z)
+  &=c\{\psi(z+h)-\psi(z-h)\},\ (h>0,\text{\(c\): constant})\\
+  &\psi(z)=\frac{1}{1+\exp(-z)}
+\end{align}
+\alert{kernel for decomposition}\\[0pt]
+(generalized differential operator)
+\begin{align}
+  \phi_{d}(z)
+  &=
+    \begin{dcases}
+      c\frac{d^{m}}{dz^{m}}\rho(z)& \text{\(m\): even}\\
+      c\frac{d^{m+1}}{dz^{m+1}}\rho(z)& \text{\(m\): odd}
+    \end{dcases}\\
+    % \left\{
+    % \begin{array}{ll}
+    %   \displaystyle
+    %   c\frac{d^{m}}{dz^{m}}\rho(z)& \text{\(m\): even}\\
+    %   \displaystyle
+    %   c\frac{d^{m+1}}{dz^{m+1}}\rho(z)& \text{\(m\): odd}
+    % \end{array}\right.\\
+  &\rho(z)=
+    \begin{dcases}
+      e^{-1/(1-|z|^2)}& |z|<1\\
+      0 & |z|\geq1
+    \end{dcases}
+    % \left\{
+    % \begin{array}{ll}
+    %   e^{-1/(1-|z|^2)}& |z|<1\\
+    %   0 & |z|\geq1
+    % \end{array}\right.
+\end{align}
+\end{frame}
+
+\begin{frame}[label={sec:orge18f2a8}]{Example of Kernels}
+\begin{columns}
+\begin{column}{0.5\columnwidth}
+\begin{center}
+\includegraphics[width=\linewidth]{phic}\\[0pt]
+kernel for composition: \(\phi_c\) \\[0pt]
+\phantom{(differential operator)}
+\end{center}
+\end{column}
+\begin{column}{0.5\columnwidth}
+\begin{center}
+\includegraphics[width=\linewidth]{phid}\\[0pt]
+kernel for decomposition: \(\phi_d\) \\[0pt]
+(differential operator)
+\end{center}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[label={sec:org178c0dd}]{Integral Representation with Ridge Function}
+\begin{theorem}[NM 1996]\label{sec:orgbb1dc29}
+With transform \(T\) 
+\begin{equation}
+  T(\boldsymbol{a},b)
+  =\frac{1}{(2\pi)^{m}}
+  % =\frac{1}{(2\pi)^{m}C_{\phi_{d},\phi_{c}}}
+  \int_{R^{m}}\phi_{d}(\boldsymbol{a}\cdot\boldsymbol{x}-b)
+  f(\boldsymbol{x})d\boldsymbol{x},
+\end{equation}
+function \(f\) is represented by
+\begin{equation}
+  f(\boldsymbol{x})
+  =\lim_{\varepsilon\to0}\int_{R^{m+1}}
+  \phi_{c}(\boldsymbol{a}\cdot\boldsymbol{x}-b)
+  T(\boldsymbol{a},b)e^{-\varepsilon|\boldsymbol{a}|^2}d\boldsymbol{a}db.
+\end{equation}
+If \(f\in L^{1}(R^{m})\cap L^{p}(R^{m})\ (1\leq p<\infty)\),
+the above equation converges in terms of \(L^{p}\)-norm.
+If \(f\in L^{1}(R^{m})\), bounded and uniformly continuous,
+the equation converges in terms of \(L^{\infty}\)-norm.
+\end{theorem}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Sketch of Proof}
+\begin{itemize}
+\item define:
+\begin{equation}
+  f_{\varepsilon}(\boldsymbol{x})
+  =
+  \int_{\mathbb{R}^{m}}\int_{\mathbb{R}}\int_{\mathbb{R}^{m}}
+  f(\boldsymbol{y})
+  \overline{\phi_{d}(\boldsymbol{a}\cdot\boldsymbol{y}-b)}
+  \phi_{c}(\boldsymbol{a}\cdot\boldsymbol{x}-b)
+  e^{-\varepsilon\norm{\boldsymbol{a}}^{2}}
+  d\boldsymbol{y}d\boldsymbol{a}db
+\end{equation}
+\item by Parseval's equality:
+\begin{equation}
+  \int_{\mathbb{R}}
+  \overline{\phi_{d}(\boldsymbol{a}\cdot\boldsymbol{y}-b)}
+  \phi_{c}(\boldsymbol{a}\cdot\boldsymbol{x}-b)
+  db
+  =
+  \int_{\mathbb{R}}
+  \overline{\hat\phi_{d}(\omega)}\hat\phi_{c}(\omega)
+  e^{i\omega\boldsymbol{a}\cdot(\boldsymbol{x}-\boldsymbol{y})}
+  db
+\end{equation}
+\item thanks to the nature of Gaussian:
+\begin{align}
+  &f_{\varepsilon}(\boldsymbol{x})\\
+  &=
+    \int_{\mathbb{R}}\int_{\mathbb{R}^{m}}\int_{\mathbb{R}^{m}}
+    \overline{\hat\phi_{d}(\omega)}\hat\phi_{c}(\omega)
+    e^{i\omega\boldsymbol{a}\cdot(\boldsymbol{x}-\boldsymbol{y})}
+    e^{-\varepsilon\norm{\boldsymbol{a}}^{2}}
+    f(\boldsymbol{y})
+    d\omega d\boldsymbol{y}d\boldsymbol{a}\\
+  &=
+    \begin{multlined}[t]
+      (2\pi)^{m}
+      \int_{\mathbb{R}^{m}}
+      G_{1/2\varepsilon}\left(
+        \boldsymbol{a}-i\omega(\boldsymbol{x}-\boldsymbol{y})/2\varepsilon
+      \right)
+      d\boldsymbol{a} \\
+      \int_{\mathbb{R}}\int_{\mathbb{R}^{m}}
+      \abs{\omega}^{-m}
+      \overline{\hat\phi_{d}(\omega)}\hat\phi_{c}(\omega)
+      G_{2\varepsilon/\omega^{2}}\left(\boldsymbol{x}-\boldsymbol{y}\right)
+      f(\boldsymbol{y})
+      d\omega d\boldsymbol{y}
+    \end{multlined}
+  \\
+  &=
+    (2\pi)^{m}
+    \int_{\mathbb{R}}
+    \abs{\omega}^{-m}
+    \overline{\hat\phi_{d}(\omega)}\hat\phi_{c}(\omega)
+    G_{2\varepsilon/\omega^{2}}
+    \ast f(\boldsymbol{x})
+    d\omega
+\end{align}
+where
+\begin{equation}
+  G_{\sigma^{2}(\boldsymbol{x})}
+  =\frac{1}{\sqrt{2\pi\sigma^{2}}^{m}}
+  \exp\left(-\frac{\norm{\boldsymbol{x}}^{2}}{2\sigma^{2}}\right)
+\end{equation}
+\item by Hölder's inequality: 
+\begin{align}
+  &\norm{f_{\varepsilon}-f}\\
+  &=
+    \norm*{
+    (2\pi)^{m}
+    \int_{\mathbb{R}}
+    \abs{\omega}^{-m}
+    \overline{\hat\phi_{d}(\omega)}\hat\phi_{c}(\omega)
+    \left(G_{2\varepsilon/\omega^{2}}\ast f - f \right)
+    d\omega}\\
+  &\leq
+    (2\pi)^{m}
+    \int_{\mathbb{R}}
+    \abs[\Big]{\omega^{-m}\overline{\hat\phi_{d}(\omega)}\hat\phi_{c}(\omega)}
+    \norm[\Big]{G_{2\varepsilon/\omega^{2}}\ast f - f}
+    d\omega\\
+  &=
+    \begin{multlined}[t]
+      (2\pi)^{m}
+      \left[\int_{\abs{\omega}\geq\gamma}+\int_{\abs{\omega}<\gamma}\right]\\
+      \abs[\Big]{\omega^{-m}\overline{\hat\phi_{d}(\omega)}\hat\phi_{c}(\omega)}
+      \norm[\Big]{G_{2\varepsilon/\omega^{2}}\ast f - f}
+      d\omega
+    \end{multlined}
+\end{align}
+\end{itemize}
+\end{frame}
+
+\subsection{approximation bound}
+\label{sec:org16f9af0}
+\begin{frame}[label={sec:orgc1a227f}]{Approximation Bound of Finite Units}
+\begin{alertblock}{Question}
+Suppose a function \(f\) is represented by a transform \(T\) as
+\begin{equation}
+  f(x)=\int
+  T(\boldsymbol{a},b)\phi_{c}(\boldsymbol{x};\boldsymbol{a},b)
+  d\boldsymbol{a}db.
+\end{equation}
+Evaluate the accuracy of a finte sum of \(\phi_c\)
+\begin{equation}
+  f_n(\boldsymbol{x})
+  =\sum_i^n c_i \phi_{c}(\boldsymbol{x};\boldsymbol{a}_i,b_i).
+\end{equation}
+\end{alertblock}
+\end{frame}
+
+\begin{frame}[label={sec:org86ec0f6}]{Assessment of Approximation}
+\begin{itemize}
+\item a function \(f\) is represented by a transform \(T\) as
+\begin{equation}
+  f(x)=\int
+  T(\boldsymbol{a},b)\phi_{c}(\boldsymbol{x};\boldsymbol{a},b)
+  d\boldsymbol{a}db.
+\end{equation}
+\item consider a finite sum of \(\phi_c\):
+\begin{equation}
+  f_n(\boldsymbol{x})
+  =\sum_i^n c_i \phi_{c}(\boldsymbol{x};\boldsymbol{a}_i,b_i).
+\end{equation}
+\item suppose inputs \(\boldsymbol{x}\in R^{m}\) are generated
+subject to a probability density \(\mu(\boldsymbol{x})\),
+evaluate the approximation by \(n\) units with the following norm:
+\begin{equation}
+  \|f_{n}(\boldsymbol{x})-f(\boldsymbol{x})\|_{L^{2}(R^{m},\mu)}^{2}
+  =\int_{R^{m}}(f_{n}(\boldsymbol{x})-f(\boldsymbol{x}))^{2}
+  \mu(\boldsymbol{x})d\boldsymbol{x}
+\end{equation}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label={sec:orgaa3c197}]{Approximation Bound}
+\begin{theorem}[NM 1996]\label{sec:org0bdf9fa}
+Suppose a function \(f\) is represented by a transform \(T\) as
+\begin{equation}
+  f(x)=\int
+  T(\boldsymbol{a},b)\phi_{c}(\boldsymbol{x};\boldsymbol{a},b)
+  d\boldsymbol{a}db.
+\end{equation}
+If the \(L_{1}\)-norm (absolute integral) of \(T\),
+\(\|T\|_{L^1}\), is bounded,
+there exists an approximation \(f_n\) with a sum of \(n\) \(\phi_{c}\)'s
+which satisfies
+\begin{equation}
+  \|f_{n}(\boldsymbol{x})-f(\boldsymbol{x})\|_{L^{2}(R^{m},\mu)}^{2}
+  \leq\frac{1}{n}\|T\|_{L^1}^{2}.
+\end{equation}
+\end{theorem}
+\end{frame}
+
+\begin{frame}[label={sec:orgde7883b}]{Approximation in Function Space (\(\|T\|_{L^1}<C\))}
+\begin{center}
+\includegraphics<1>[height=.8\textheight]{fn_approx0}%
+\includegraphics<2>[height=.8\textheight]{fn_approx1}%
+\includegraphics<3>[height=.8\textheight]{fn_approx2}%
+\includegraphics<4>[height=.8\textheight]{fn_approx3}%
+\includegraphics<5>[height=.8\textheight]{fn_approx4}%
+\includegraphics<6>[height=.8\textheight]{fn_approx5}%
+\includegraphics<7>[height=.8\textheight]{fn_approx}%
+% \onslide<7->{function space is filled by finite unit model}
+\end{center}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Sketch of Proof}
+\begin{itemize}
+\item since \(f\) and \(\phi_{c}\) are real-valued functions,
+\(T\) is real.
+\item normalize \(T\)
+and construct a probability distribution on \((\boldsymbol{a},b)\).
+\begin{equation}
+  p(\boldsymbol{a},b)=\frac{|T(\boldsymbol{a},b)|}{\|T\|_{L^{1}}},
+\end{equation}
+\end{itemize}
+\begin{columns}
+\begin{column}{0.45\columnwidth}
+\begin{center}
+\includegraphics[width=.9\linewidth]{random_coding}\\[0pt]
+random coding
+\end{center}
+\end{column}
+\begin{column}{0.55\columnwidth}
+\begin{itemize}
+\item select \(n\) pairs of \((\boldsymbol{a},b)\) independently
+subject to \(p(\boldsymbol{a},b)\),
+and construct
+\begin{equation}
+  f_{n}(\boldsymbol{x})=\frac{1}{n}\sum_{i=1}^{n}
+  c_i\phi_{c}(\boldsymbol{a}_{i}\cdot\boldsymbol{x}-b_{i}),
+\end{equation}
+where \(c_i=\mathrm{sign}(T(\boldsymbol{a}_{i},b_{i}))\cdot\|T\|_{L^1}\).
+\end{itemize}
+\end{column}
+\end{columns}
+\pagebreak
+\begin{itemize}
+\item for fixed \(x\), consider a random variable
+\begin{equation}
+  X_i=c_i\phi_{c}(\boldsymbol{a}_{i}\cdot\boldsymbol{x}-b_{i}),
+\end{equation}
+then
+\begin{equation}
+  EX_i=f(x),\; V(X_i)\leq\|T\|_{L^1}^2
+  \cdot\left(\max_{z}\phi_c(z)\right)^2.
+\end{equation}
+in the following discussion, assume \(|\phi_{c}|<1\).
+\item mean squared error of function \(f_n\) is evaluated as
+\begin{multline}
+  E\int(f_{n}(\boldsymbol{x})-f(\boldsymbol{x}))^{2}
+  \mu(\boldsymbol{x})d\boldsymbol{x}
+  =\int V(f_n(\boldsymbol{x}))
+  \mu(\boldsymbol{x})d\boldsymbol{x}\\
+  =\int V\left(\frac{1}{n}(X_1+X_2+\dots+X_n)\right)
+  \mu(\boldsymbol{x})d\boldsymbol{x}
+  \leq\frac{1}{n}\|T\|_{L^1}^2.
+\end{multline}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label={sec:orgcbee920}]{Approximation Bound and Smoothness}
+\begin{center}
+example of function spaces with \(O(1/n)\)-rate convergence 
+\end{center}
+\begin{center}
+\small
+\begin{tabular}[h]{lll}
+  \hline
+  function space
+  & approximation & \\
+  \hline
+  \(\displaystyle\int|\hat{f}(\boldsymbol\omega)|d\boldsymbol\omega
+  < \infty\)
+  &\(\displaystyle %f(\boldsymbol{x})=
+    \sum_{i=1}^n c_i\sin(\boldsymbol{a}_i\cdot\boldsymbol{x}-b_i)\)
+                  & (Jones 1992)\\
+  \(\displaystyle\int|\boldsymbol\omega||\hat{f}(\boldsymbol\omega)|d\boldsymbol\omega
+  < \infty\)
+  &\(\displaystyle %f(\boldsymbol{x})=
+    \sum_{i=1}^n c_i\sigma(\boldsymbol{a}_i\cdot\boldsymbol{x}-b_i)\)
+                  & (Barron 1993)\\
+  \(m\)-th H\"older continuous
+  &\(\displaystyle %f(\boldsymbol{x})=
+    \sum_{i=1}^n c_i\sigma(\boldsymbol{a}_i\cdot\boldsymbol{x}-b_i)\)
+                  & (NM 1996)\\
+  \(\displaystyle H^{2p,1}(R^m),\ 2p>m\)
+  &\(\displaystyle %f(\boldsymbol{x})=
+    \sum_{i=1}^n c_i e^{-|\boldsymbol{x}-\boldsymbol{a}_i|^2/b_i^2}\)
+                  & (Girosi 1993)\\
+  \hline
+\end{tabular}
+\\[3pt]
+\begin{minipage}[h]{.7\linewidth}
+  where \(\sigma\) is the sigmoid function,
+  \(H^{2p,1}(R^m)\) is the Sobolev space of
+  \(2p\)-th order differentiable.
+\end{minipage}
+\end{center}
+\nocite{Murata1996}
+\end{frame}
+
+\subsection{approximation error}
+\label{sec:org59edcc3}
+\begin{frame}[label={sec:orge1a828d}]{Learning from Examples}
+\begin{itemize}
+\item \alert{aim:} minimize approximation errors of
+a contaminated function \(y=f(\boldsymbol{x})+\xi\) 
+\begin{itemize}
+\item \(f_{n,opt}\) -- not obtainable
+\begin{equation}
+  \text{minimize }
+  \|y-f_{n}\|^{2}
+  =E_{\boldsymbol{x},y}(y-f_{n}(\boldsymbol{x}))^{2}\;
+\end{equation}
+\item \(f_{n,t}\) -- obtainable
+\begin{equation}
+  \text{minimize }
+  \frac{1}{t}\sum_{j=1}^{t}(y_{j}-f_{n}(\boldsymbol{x}_{j}))^{2}\;
+\end{equation}
+\end{itemize}
+\item \alert{error decomposition:}
+\begin{equation}
+  \|y-f_{n,t}\|^{2}\Rightarrow
+  \underbrace{\|y-f_{n,opt}\|^{2}}_{\text{structural error}}+
+  \underbrace{\|f_{n,opt}-f_{n,t}\|^{2}}_{\text{learning error}}
+\end{equation}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label={sec:org93dff15}]{Structural Error}
+\begin{itemize}
+\item errors caused by model structure:
+\begin{align}
+  \|y-f_{n,opt}\|^{2}
+  &=E_{\boldsymbol{x},y}(y-f_{n,opt}(\boldsymbol{x}))^{2}\\
+  &=E_{\boldsymbol{x},\xi}(f(\boldsymbol{x})+\xi
+    -f_{n,opt}(\boldsymbol{x}))^{2}\\
+  &=E_{\xi}(\xi^2)+
+    E_{\boldsymbol{x}}(f(\boldsymbol{x})
+    -f_{n,opt}(\boldsymbol{x}))^{2}\\
+  &=V(\xi)+\|f_{n,opt}-f\|^{2}_{L^{2}(R^{m},\mu)}\\
+  &\leq\sigma^{2}+\frac{2\|T\|_{L^1}^{2}}{n},
+\end{align}
+where \(\sigma^{2}\) is the variance of an additive noise \(\xi\).
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label={sec:orgcdaf5d3}]{Learning Error}
+\begin{itemize}
+\item errors caused by training from examples:
+\begin{align}
+  E\left[\|y-f_{n,t}\|^{2}\right]
+  &=\|y-f_{n,opt}\|^{2}
+    +\frac{1}{2t}\mathrm{tr} GH^{-1}+o\left(\frac{1}{t}\right)\\
+  V\left[\|y-f_{n,t}\|^{2}\right]
+  &=\frac{1}{2t^{2}}\mathrm{tr} GH^{-1}GH^{-1}
+    +o\left(\frac{1}{t^{2}}\right),
+\end{align}
+where \(ij\)-elemensts of \(G\) and \(H\)
+are given by using the partial derivative with respect to the
+\(i\)-th element, \(\partial_{i}\), as
+\begin{align}
+  G_{ij}
+  &=
+    E_{\boldsymbol{x},y}(\partial_{i}(y-f_{n}(\boldsymbol{x}))^{2}
+    \partial_{j}(y-f_{n}(\boldsymbol{x}))^{2})\\
+  H_{ij}
+  &=
+    E_{\boldsymbol{x},y}(\partial_{i}\partial_{i}
+    (y-f_{n}(\boldsymbol{x}))^{2}).
+\end{align}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[label={sec:org192272b}]{Error Bound}
+\begin{theorem}[]\label{sec:org732e9b3}
+The squared error of three-layered perceptron
+is asymptotically bound by
+\begin{align}
+  \|y-f_{n,t}\|^{2}
+  &\leq \sigma^{2}+\frac{2\|T\|_{L^{1}}^2}{n}\\
+  &\qquad+\frac{1}{t}\left(\frac{\mathrm{tr} GH^{-1}}{2}+
+    \sqrt{\frac{\mathrm{tr} GH^{-1}GH^{-1}}{2\delta}}\right)\\
+  &\qquad+o\left(\frac{1}{n}\right)+
+    o\left(\frac{1}{t}\right)
+\end{align}
+with probability \(1-\delta\).
+\end{theorem}
+\end{frame}
+
+\section{Conclusion}
+\label{sec:org8861d2f}
+\begin{frame}[label={sec:org1955a8e}]{Concluding Remarks}
+we have investigated
+\begin{itemize}
+\item integral representation of three-layered perceptron
+\item approximation bounds of some function spaces
+\end{itemize}
+
+further works are done on
+\begin{itemize}
+\item specifying classes of activation functions
+\item investigating reproducing kernel Hilbert spaces
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[allowframebreaks]{References}
+\printbibliography[heading=none]
+\end{frame}
+\end{document}

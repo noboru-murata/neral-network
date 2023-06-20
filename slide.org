@@ -1,0 +1,700 @@
+#+TITLE: Universality of Multi-Layer Perceptron
+#+SUBTITLE: integral representaion and approximation bound
+#+AUTHOR: Noboru Murata
+#+EMAIL: noboru.murata@gmail.com
+#+DATE: \today
+#+DESCRIPTION: based on N. Murata & Amari 1999, doi:10.1016/S0165-1684(98)00206-0
+#+KEYWORDS: multiple spike trains, stochastic modeling, graph inference
+#+LANGUAGE: en
+#+STARTUP: beamer hidestars content indent
+:BEAMER:
+#+OPTIONS: H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS: TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+# #+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:https://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+HTML_LINK_UP:
+#+HTML_LINK_HOME:
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [fleqn,aspectratio=1610]
+#+BEAMER_HEADER: \usepackage[toc=none]{mytalk}
+# #+BEAMER_HEADER: \usepackage[toc=none,font=heavy]{mytalk}
+#+BEAMER_HEADER: \addbibresource{papers.bib}
+#+BEAMER_HEADER: \graphicspath{{figs/},{figs/pnas/},{refs/}}
+#+BEAMER_HEADER: \DeclareGraphicsExtensions{.pdf,.png,.eps,.jpg}
+#+BEAMER_HEADER: \institute{\url{https://noboru-murata.github.io/}}
+# #+BEAMER_HEADER: \institute[WASEDA]{Waseda University\\\url{https://noboru-murata.github.io/}}
+# #+BEAMER_HEADER: \titlegraphic{\includegraphics[height=1.5cm]{symbol_waseda_3.jpg}
+# #+BEAMER_HEADER:    \includegraphics[height=1.5cm,viewport=0 0 150 150,clip]{UTlogo.jpg}
+# #+BEAMER_HEADER:    \includegraphics[height=1.5cm]{nict-logo-new2.png}}
+# #+BEAMER_HEADER: \myLogo{\lower9pt\hbox{
+# #+BEAMER_HEADER:    \reflectbox{\includegraphics[height=26pt]{milk_gray.png}}
+# #+BEAMER_HEADER:    \kern-8pt\includegraphics[height=18pt,width=22pt]{milk_sepia.png}}}
+#+COLUMNS: "%45ITEM %10BEAMER_env(Env) %10BEAMER_act(Act) %4BEAMER_col(Col) %8BEAMER_opt(Opt)"
+# column view: C-c C-x C-c / C-c C-c or q
+# beamer block: C-c C-b
+:END:
+
+* Introduction
+** mathematical model of neuron
+*** Specification of Brain
+**** left                                                          :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.57
+:END:
+#+begin_center
+\includegraphics[width=\linewidth]{800px-Sobo_1909_624}
+@@latex:\\[10pt]@@
+#+end_center
+#+BEAMER: \scriptsize
+An anatomical illustration from Sobotta's Human Anatomy 1908
+# \includegraphics[width=\linewidth]{bsi/sag}\\[10pt]
+# {\scriptsize RIKEN BSI (http://www.brain.riken.go.jp)}
+**** right                                                         :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.43
+:END:
+- weight: 1400g (2-3% of body)
+- neurons:
+  - cerebrum -- \(1.4 \times 10^{10}\)
+  - cerebellum -- \(1.0 \times 10^{11}\)
+- neuroglia: \\
+  ten times of neurons
+- synapses: \\
+  \(10^{3}\) -- \(10^{5}\) per neuron
+- energy consumption: 
+  - blood -- 15%
+  - oxygen -- 20%
+  - dextrose -- 25%
+
+*** Mathematical Model
+:PROPERTIES:
+:BEAMER_opt: t
+:END:
+output
+#+begin_center
+\includegraphics[width=.5\textwidth]{neuron_model}
+#+end_center
+- output: pulses from 0Hz to 500Hz
+- normalize
+  - max frequency: 500Hz \(\mapsto1\) 
+  - min frequency: 0Hz \(\mapsto0\)
+
+*** Mathematical Model
+:PROPERTIES:
+:BEAMER_opt: t
+:END:
+internal state
+#+begin_center
+\includegraphics[width=.5\textwidth]{neuron_model}
+#+end_center
+- input from other neuron: \(x_i\)
+- strength of synapse: \(w_i\)
+- internal state: *weighted sum of inputs*
+  \begin{equation}
+    u=\sum_{i} w_i x_i
+  \end{equation}
+
+*** Mathematical Model
+:PROPERTIES:
+:BEAMER_opt: t
+:END:
+activation
+#+begin_center
+\includegraphics[width=.5\textwidth]{neuron_model}
+#+end_center
+**** left                                                          :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.7
+:END:
+- output a pulse when the internal state exceeds a certain constant:\\
+  *thresholding*
+- range from 0 to 1:\\
+  *non-linear transformation*
+**** right                                                         :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+begin_center
+\includegraphics[width=\textwidth]{sigmoid}
+#+end_center
+
+*** Mathematical Model
+:PROPERTIES:
+:BEAMER_opt: t
+:END:
+activation
+input-output
+#+begin_center
+\includegraphics[width=.5\textwidth]{neuron_model}
+#+end_center
+\begin{align}
+  y=&\psi\left(\sum_{i=1}^{m}w_ix_i-\theta\right)
+      \qquad\text{(model of a neuron)}\\
+    &\quad y: \text{output}\\
+    &\quad \theta: \text{threshold}\\
+    &\quad \psi: \text{activation function}
+\end{align}
+
+** artificial neural network
+*** Three-Layered Perceptron
+**** left                                                          :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.45
+:END:
+#+begin_center
+#+begin_export latex
+\unitlength=0.01\textwidth
+\begin{picture}(100,120)
+  \put(50,5){\makebox(0,0){input \(\boldsymbol{x}\)}}
+  \put(50,115){\makebox(0,0){output \(\boldsymbol{y}\)}}
+  \put(50,10){\makebox(0,0)[b]
+    {\includegraphics[height=100\unitlength]{neural}}}
+\end{picture}
+#+end_export
+#+end_center
+**** right                                                         :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.55
+:END:
+a simple calculation system
+consists of mathematical neurons
+\begin{equation}
+  \begin{split}
+    y_i=\sum_{j=1}^hc_{ij}\psi\left(\sum_{k=1}^{m}a_{jk}x_k-b_j\right),\\
+    (i=1,\dotsc,l)
+  \end{split}
+\end{equation}
+(\(m\)-dim input, \(1\)-dim output)
+
+*** Pros of Neural Network
+- easily implemented on computers because of
+  homogeneously structured simple units
+- simple and fast learning algorithms\\
+  (error-backpropagation: gradient method calculated via chain rule)
+- size of units and structure of network can be roughly
+  designed without detailed prior knowledges
+- learning from examples sometimes gives
+  a unexpected result, which may include
+  important information of data inside networks
+
+* Problem Formulation
+** universarity of three-layered perceptron
+*** Universarity of Three-Layered Perceptron
+**** Question                                               :B_alertblock:
+:PROPERTIES:
+:BEAMER_env: alertblock
+:END:
+Find which class of functions can be well approximated by
+three layered perceptron with \(m\)-dim input and \(1\)-dim output:
+\begin{equation}
+  y=\sum_{j=1}^hc_{j}\psi\left(\sum_{k=1}^{m}a_{jk}x_k-b_j\right).
+\end{equation}
+
+*** Ridge Function
+**** left                                                          :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_center
+\includegraphics[width=.9\linewidth]{ridge_fn}\\
+a ridge function on \(R^{2}\)
+#+end_center
+
+**** ridge function                                   :B_definition:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_env: definition
+:END:
+A function which is decribed with
+a vector \(\boldsymbol{a}\in R^{m}\), a scalar \(b\in R\),
+and a function \(G:R\to R\) as
+\begin{equation}
+  F(\boldsymbol{x})=G(\boldsymbol{a}\cdot\boldsymbol{x}-b)
+\end{equation}
+is called *ridge function*.
+
+*** Dual Kernels
+*admissibility condition* and *transformation*
+- suppose two functions \(\phi_{d},\phi_{c}\in L^{1}(R)\cap
+  L^{2}(R)\) are bounded, and the following integral exists:
+  \begin{equation}
+    \int_{R^{m}}|\omega|^{-m}
+    \hat\phi_{d}(\omega)\hat\phi_{c}(\omega)d\omega=1%(2\pi)^{-m}
+  \end{equation}
+  # \begin{equation}
+  #   C_{\phi_{d},\phi_{c}}=\int_{R^{m}}|\omega|^{-m}
+  #   \hat\phi_{d}(\omega)\hat\phi_{c}(\omega)d\omega,\
+  #   (0<|C_{\phi_{d},\phi_{c}}|<\infty),
+  # \end{equation}
+  where \(\hat\cdot\) denotes Fourier transform.
+- define a transformation of \(f\) with \(\phi_{d}\) by
+  \begin{equation}
+    T(\boldsymbol{a},b)
+    =\frac{1}{(2\pi)^{m}}
+    \int_{R^{m}}\phi_{d}(\boldsymbol{a}\cdot\boldsymbol{x}-b)
+    f(\boldsymbol{x})d\boldsymbol{x}
+  \end{equation}
+  # \begin{equation}
+  #   T(\boldsymbol{a},b)
+  #   =\frac{1}{(2\pi)^{m}C_{\phi_{d},\phi_{c}}}
+  #   \int_{R^{m}}\phi_{d}(\boldsymbol{a}\cdot\boldsymbol{x}-b)
+  #   f(\boldsymbol{x})d\boldsymbol{x}.
+  # \end{equation}
+
+*** Example of Kernels
+*kernel for composition*\\
+(combination of sigmoid functions)
+\begin{align}
+  \phi_{c}(z)
+  &=c\{\psi(z+h)-\psi(z-h)\},\ (h>0,\text{\(c\): constant})\\
+  &\psi(z)=\frac{1}{1+\exp(-z)}
+\end{align}
+*kernel for decomposition*\\
+(generalized differential operator)
+\begin{align}
+  \phi_{d}(z)
+  &=
+    \begin{dcases}
+      c\frac{d^{m}}{dz^{m}}\rho(z)& \text{\(m\): even}\\
+      c\frac{d^{m+1}}{dz^{m+1}}\rho(z)& \text{\(m\): odd}
+    \end{dcases}\\
+    % \left\{
+    % \begin{array}{ll}
+    %   \displaystyle
+    %   c\frac{d^{m}}{dz^{m}}\rho(z)& \text{\(m\): even}\\
+    %   \displaystyle
+    %   c\frac{d^{m+1}}{dz^{m+1}}\rho(z)& \text{\(m\): odd}
+    % \end{array}\right.\\
+  &\rho(z)=
+    \begin{dcases}
+      e^{-1/(1-|z|^2)}& |z|<1\\
+      0 & |z|\geq1
+    \end{dcases}
+    % \left\{
+    % \begin{array}{ll}
+    %   e^{-1/(1-|z|^2)}& |z|<1\\
+    %   0 & |z|\geq1
+    % \end{array}\right.
+\end{align}
+
+*** Example of Kernels
+**** left                                                          :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_center
+\includegraphics[width=\linewidth]{phic}\\
+kernel for composition: \(\phi_c\) \\
+@@latex:\phantom{(differential operator)}@@
+#+end_center
+**** right                                                         :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+begin_center
+\includegraphics[width=\linewidth]{phid}\\
+kernel for decomposition: \(\phi_d\) \\
+(differential operator)
+#+end_center
+
+*** Integral Representation with Ridge Function
+**** NM 1996                                                   :B_theorem:
+:PROPERTIES:
+:BEAMER_env: theorem
+:END:
+With transform \(T\) 
+\begin{equation}
+  T(\boldsymbol{a},b)
+  =\frac{1}{(2\pi)^{m}}
+  % =\frac{1}{(2\pi)^{m}C_{\phi_{d},\phi_{c}}}
+  \int_{R^{m}}\phi_{d}(\boldsymbol{a}\cdot\boldsymbol{x}-b)
+  f(\boldsymbol{x})d\boldsymbol{x},
+\end{equation}
+function \(f\) is represented by
+\begin{equation}
+  f(\boldsymbol{x})
+  =\lim_{\varepsilon\to0}\int_{R^{m+1}}
+  \phi_{c}(\boldsymbol{a}\cdot\boldsymbol{x}-b)
+  T(\boldsymbol{a},b)e^{-\varepsilon|\boldsymbol{a}|^2}d\boldsymbol{a}db.
+\end{equation}
+If \(f\in L^{1}(R^{m})\cap L^{p}(R^{m})\ (1\leq p<\infty)\),
+the above equation converges in terms of \(L^{p}\)-norm.
+If \(f\in L^{1}(R^{m})\), bounded and uniformly continuous,
+the equation converges in terms of \(L^{\infty}\)-norm.
+
+*** Sketch of Proof
+:PROPERTIES:
+:BEAMER_opt: allowframebreaks
+:END:
+- define:
+  \begin{equation}
+    f_{\varepsilon}(\boldsymbol{x})
+    =
+    \int_{\mathbb{R}^{m}}\int_{\mathbb{R}}\int_{\mathbb{R}^{m}}
+    f(\boldsymbol{y})
+    \overline{\phi_{d}(\boldsymbol{a}\cdot\boldsymbol{y}-b)}
+    \phi_{c}(\boldsymbol{a}\cdot\boldsymbol{x}-b)
+    e^{-\varepsilon\norm{\boldsymbol{a}}^{2}}
+    d\boldsymbol{y}d\boldsymbol{a}db
+  \end{equation}
+- by Parseval's equality:
+  \begin{equation}
+    \int_{\mathbb{R}}
+    \overline{\phi_{d}(\boldsymbol{a}\cdot\boldsymbol{y}-b)}
+    \phi_{c}(\boldsymbol{a}\cdot\boldsymbol{x}-b)
+    db
+    =
+    \int_{\mathbb{R}}
+    \overline{\hat\phi_{d}(\omega)}\hat\phi_{c}(\omega)
+    e^{i\omega\boldsymbol{a}\cdot(\boldsymbol{x}-\boldsymbol{y})}
+    db
+  \end{equation}
+- thanks to the nature of Gaussian:
+  \begin{align}
+    &f_{\varepsilon}(\boldsymbol{x})\\
+    &=
+      \int_{\mathbb{R}}\int_{\mathbb{R}^{m}}\int_{\mathbb{R}^{m}}
+      \overline{\hat\phi_{d}(\omega)}\hat\phi_{c}(\omega)
+      e^{i\omega\boldsymbol{a}\cdot(\boldsymbol{x}-\boldsymbol{y})}
+      e^{-\varepsilon\norm{\boldsymbol{a}}^{2}}
+      f(\boldsymbol{y})
+      d\omega d\boldsymbol{y}d\boldsymbol{a}\\
+    &=
+      \begin{multlined}[t]
+        (2\pi)^{m}
+        \int_{\mathbb{R}^{m}}
+        G_{1/2\varepsilon}\left(
+          \boldsymbol{a}-i\omega(\boldsymbol{x}-\boldsymbol{y})/2\varepsilon
+        \right)
+        d\boldsymbol{a} \\
+        \int_{\mathbb{R}}\int_{\mathbb{R}^{m}}
+        \abs{\omega}^{-m}
+        \overline{\hat\phi_{d}(\omega)}\hat\phi_{c}(\omega)
+        G_{2\varepsilon/\omega^{2}}\left(\boldsymbol{x}-\boldsymbol{y}\right)
+        f(\boldsymbol{y})
+        d\omega d\boldsymbol{y}
+      \end{multlined}
+    \\
+    &=
+      (2\pi)^{m}
+      \int_{\mathbb{R}}
+      \abs{\omega}^{-m}
+      \overline{\hat\phi_{d}(\omega)}\hat\phi_{c}(\omega)
+      G_{2\varepsilon/\omega^{2}}
+      \ast f(\boldsymbol{x})
+      d\omega
+  \end{align}
+  where
+  \begin{equation}
+    G_{\sigma^{2}(\boldsymbol{x})}
+    =\frac{1}{\sqrt{2\pi\sigma^{2}}^{m}}
+    \exp\left(-\frac{\norm{\boldsymbol{x}}^{2}}{2\sigma^{2}}\right)
+  \end{equation}
+- by Hölder's inequality: 
+  \begin{align}
+    &\norm{f_{\varepsilon}-f}\\
+    &=
+      \norm*{
+      (2\pi)^{m}
+      \int_{\mathbb{R}}
+      \abs{\omega}^{-m}
+      \overline{\hat\phi_{d}(\omega)}\hat\phi_{c}(\omega)
+      \left(G_{2\varepsilon/\omega^{2}}\ast f - f \right)
+      d\omega}\\
+    &\leq
+      (2\pi)^{m}
+      \int_{\mathbb{R}}
+      \abs[\Big]{\omega^{-m}\overline{\hat\phi_{d}(\omega)}\hat\phi_{c}(\omega)}
+      \norm[\Big]{G_{2\varepsilon/\omega^{2}}\ast f - f}
+      d\omega\\
+    &=
+      \begin{multlined}[t]
+        (2\pi)^{m}
+        \left[\int_{\abs{\omega}\geq\gamma}+\int_{\abs{\omega}<\gamma}\right]\\
+        \abs[\Big]{\omega^{-m}\overline{\hat\phi_{d}(\omega)}\hat\phi_{c}(\omega)}
+        \norm[\Big]{G_{2\varepsilon/\omega^{2}}\ast f - f}
+        d\omega
+      \end{multlined}
+  \end{align}
+
+** approximation bound
+*** Approximation Bound of Finite Units
+**** Question                                               :B_alertblock:
+:PROPERTIES:
+:BEAMER_env: alertblock
+:END:
+Suppose a function \(f\) is represented by a transform \(T\) as
+\begin{equation}
+  f(x)=\int
+  T(\boldsymbol{a},b)\phi_{c}(\boldsymbol{x};\boldsymbol{a},b)
+  d\boldsymbol{a}db.
+\end{equation}
+Evaluate the accuracy of a finte sum of \(\phi_c\)
+\begin{equation}
+  f_n(\boldsymbol{x})
+  =\sum_i^n c_i \phi_{c}(\boldsymbol{x};\boldsymbol{a}_i,b_i).
+\end{equation}
+
+*** Assessment of Approximation
+- a function \(f\) is represented by a transform \(T\) as
+  \begin{equation}
+    f(x)=\int
+    T(\boldsymbol{a},b)\phi_{c}(\boldsymbol{x};\boldsymbol{a},b)
+    d\boldsymbol{a}db.
+  \end{equation}
+- consider a finite sum of \(\phi_c\):
+  \begin{equation}
+    f_n(\boldsymbol{x})
+    =\sum_i^n c_i \phi_{c}(\boldsymbol{x};\boldsymbol{a}_i,b_i).
+  \end{equation}
+- suppose inputs \(\boldsymbol{x}\in R^{m}\) are generated
+  subject to a probability density \(\mu(\boldsymbol{x})\),
+  evaluate the approximation by \(n\) units with the following norm:
+  \begin{equation}
+    \|f_{n}(\boldsymbol{x})-f(\boldsymbol{x})\|_{L^{2}(R^{m},\mu)}^{2}
+    =\int_{R^{m}}(f_{n}(\boldsymbol{x})-f(\boldsymbol{x}))^{2}
+    \mu(\boldsymbol{x})d\boldsymbol{x}
+  \end{equation}
+
+*** Approximation Bound
+**** NM 1996                                                   :B_theorem:
+:PROPERTIES:
+:BEAMER_env: theorem
+:END:
+Suppose a function \(f\) is represented by a transform \(T\) as
+\begin{equation}
+  f(x)=\int
+  T(\boldsymbol{a},b)\phi_{c}(\boldsymbol{x};\boldsymbol{a},b)
+  d\boldsymbol{a}db.
+\end{equation}
+If the \(L_{1}\)-norm (absolute integral) of \(T\),
+\(\|T\|_{L^1}\), is bounded,
+there exists an approximation \(f_n\) with a sum of \(n\) \(\phi_{c}\)'s
+which satisfies
+\begin{equation}
+  \|f_{n}(\boldsymbol{x})-f(\boldsymbol{x})\|_{L^{2}(R^{m},\mu)}^{2}
+  \leq\frac{1}{n}\|T\|_{L^1}^{2}.
+\end{equation}
+
+*** Approximation in Function Space (\(\|T\|_{L^1}<C\))
+#+begin_center
+#+begin_export latex
+\includegraphics<1>[height=.8\textheight]{fn_approx0}%
+\includegraphics<2>[height=.8\textheight]{fn_approx1}%
+\includegraphics<3>[height=.8\textheight]{fn_approx2}%
+\includegraphics<4>[height=.8\textheight]{fn_approx3}%
+\includegraphics<5>[height=.8\textheight]{fn_approx4}%
+\includegraphics<6>[height=.8\textheight]{fn_approx5}%
+\includegraphics<7>[height=.8\textheight]{fn_approx}%
+% \onslide<7->{function space is filled by finite unit model}
+#+end_export
+#+end_center
+
+*** Sketch of Proof
+:PROPERTIES:
+:BEAMER_opt: allowframebreaks
+:END:
+- since \(f\) and \(\phi_{c}\) are real-valued functions,
+  \(T\) is real.
+- normalize \(T\)
+  and construct a probability distribution on \((\boldsymbol{a},b)\).
+  \begin{equation}
+    p(\boldsymbol{a},b)=\frac{|T(\boldsymbol{a},b)|}{\|T\|_{L^{1}}},
+  \end{equation}
+**** left                                                          :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.45
+:END:
+#+begin_center
+\includegraphics[width=.9\linewidth]{random_coding}\\
+random coding
+#+end_center
+**** right                                                         :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.55
+:END:
+- select \(n\) pairs of \((\boldsymbol{a},b)\) independently
+  subject to \(p(\boldsymbol{a},b)\),
+  and construct
+  \begin{equation}
+    f_{n}(\boldsymbol{x})=\frac{1}{n}\sum_{i=1}^{n}
+    c_i\phi_{c}(\boldsymbol{a}_{i}\cdot\boldsymbol{x}-b_{i}),
+  \end{equation}
+  where \(c_i=\mathrm{sign}(T(\boldsymbol{a}_{i},b_{i}))\cdot\|T\|_{L^1}\).
+**** bottom                                              :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+#+BEAMER: \pagebreak
+- for fixed \(x\), consider a random variable
+  \begin{equation}
+    X_i=c_i\phi_{c}(\boldsymbol{a}_{i}\cdot\boldsymbol{x}-b_{i}),
+  \end{equation}
+  then
+  \begin{equation}
+    EX_i=f(x),\; V(X_i)\leq\|T\|_{L^1}^2
+    \cdot\left(\max_{z}\phi_c(z)\right)^2.
+  \end{equation}
+  in the following discussion, assume \(|\phi_{c}|<1\).
+- mean squared error of function \(f_n\) is evaluated as
+  \begin{multline}
+    E\int(f_{n}(\boldsymbol{x})-f(\boldsymbol{x}))^{2}
+    \mu(\boldsymbol{x})d\boldsymbol{x}
+    =\int V(f_n(\boldsymbol{x}))
+    \mu(\boldsymbol{x})d\boldsymbol{x}\\
+    =\int V\left(\frac{1}{n}(X_1+X_2+\dots+X_n)\right)
+    \mu(\boldsymbol{x})d\boldsymbol{x}
+    \leq\frac{1}{n}\|T\|_{L^1}^2.
+  \end{multline}
+
+*** Approximation Bound and Smoothness
+#+begin_center
+example of function spaces with \(O(1/n)\)-rate convergence 
+#+end_center
+#+begin_center
+#+begin_export latex
+\small
+\begin{tabular}[h]{lll}
+  \hline
+  function space
+  & approximation & \\
+  \hline
+  \(\displaystyle\int|\hat{f}(\boldsymbol\omega)|d\boldsymbol\omega
+  < \infty\)
+  &\(\displaystyle %f(\boldsymbol{x})=
+    \sum_{i=1}^n c_i\sin(\boldsymbol{a}_i\cdot\boldsymbol{x}-b_i)\)
+                  & (Jones 1992)\\
+  \(\displaystyle\int|\boldsymbol\omega||\hat{f}(\boldsymbol\omega)|d\boldsymbol\omega
+  < \infty\)
+  &\(\displaystyle %f(\boldsymbol{x})=
+    \sum_{i=1}^n c_i\sigma(\boldsymbol{a}_i\cdot\boldsymbol{x}-b_i)\)
+                  & (Barron 1993)\\
+  \(m\)-th H\"older continuous
+  &\(\displaystyle %f(\boldsymbol{x})=
+    \sum_{i=1}^n c_i\sigma(\boldsymbol{a}_i\cdot\boldsymbol{x}-b_i)\)
+                  & (NM 1996)\\
+  \(\displaystyle H^{2p,1}(R^m),\ 2p>m\)
+  &\(\displaystyle %f(\boldsymbol{x})=
+    \sum_{i=1}^n c_i e^{-|\boldsymbol{x}-\boldsymbol{a}_i|^2/b_i^2}\)
+                  & (Girosi 1993)\\
+  \hline
+\end{tabular}
+\\[3pt]
+\begin{minipage}[h]{.7\linewidth}
+  where \(\sigma\) is the sigmoid function,
+  \(H^{2p,1}(R^m)\) is the Sobolev space of
+  \(2p\)-th order differentiable.
+\end{minipage}
+#+end_export
+#+end_center
+\nocite{Murata1996}
+
+** approximation error
+*** Learning from Examples
+- *aim:* minimize approximation errors of
+  a contaminated function \(y=f(\boldsymbol{x})+\xi\) 
+  - \(f_{n,opt}\) -- not obtainable
+    \begin{equation}
+      \text{minimize }
+      \|y-f_{n}\|^{2}
+      =E_{\boldsymbol{x},y}(y-f_{n}(\boldsymbol{x}))^{2}\;
+    \end{equation}
+  - \(f_{n,t}\) -- obtainable
+    \begin{equation}
+      \text{minimize }
+      \frac{1}{t}\sum_{j=1}^{t}(y_{j}-f_{n}(\boldsymbol{x}_{j}))^{2}\;
+    \end{equation}
+- *error decomposition:*
+  \begin{equation}
+    \|y-f_{n,t}\|^{2}\Rightarrow
+    \underbrace{\|y-f_{n,opt}\|^{2}}_{\text{structural error}}+
+    \underbrace{\|f_{n,opt}-f_{n,t}\|^{2}}_{\text{learning error}}
+  \end{equation}
+# \begin{multline}
+#   \|y-f_{n,t}\|^{2}\Rightarrow
+#   \underbrace{\|y-f_{n,opt}\|^{2}}_{\text{structural error}}
+#   +\underbrace{\left(\|y-f_{n,t}\|^{2}
+#     -\|y-f_{n,opt}\|^{2}\right)}_{\text{learning error}}.
+# \end{multline}
+
+*** Structural Error
+- errors caused by model structure:
+  \begin{align}
+    \|y-f_{n,opt}\|^{2}
+    &=E_{\boldsymbol{x},y}(y-f_{n,opt}(\boldsymbol{x}))^{2}\\
+    &=E_{\boldsymbol{x},\xi}(f(\boldsymbol{x})+\xi
+      -f_{n,opt}(\boldsymbol{x}))^{2}\\
+    &=E_{\xi}(\xi^2)+
+      E_{\boldsymbol{x}}(f(\boldsymbol{x})
+      -f_{n,opt}(\boldsymbol{x}))^{2}\\
+    &=V(\xi)+\|f_{n,opt}-f\|^{2}_{L^{2}(R^{m},\mu)}\\
+    &\leq\sigma^{2}+\frac{2\|T\|_{L^1}^{2}}{n},
+  \end{align}
+  where \(\sigma^{2}\) is the variance of an additive noise \(\xi\).
+
+*** Learning Error
+- errors caused by training from examples:
+  \begin{align}
+    E\left[\|y-f_{n,t}\|^{2}\right]
+    &=\|y-f_{n,opt}\|^{2}
+      +\frac{1}{2t}\mathrm{tr} GH^{-1}+o\left(\frac{1}{t}\right)\\
+    V\left[\|y-f_{n,t}\|^{2}\right]
+    &=\frac{1}{2t^{2}}\mathrm{tr} GH^{-1}GH^{-1}
+      +o\left(\frac{1}{t^{2}}\right),
+  \end{align}
+  where \(ij\)-elemensts of \(G\) and \(H\)
+  are given by using the partial derivative with respect to the
+  \(i\)-th element, \(\partial_{i}\), as
+  \begin{align}
+    G_{ij}
+    &=
+      E_{\boldsymbol{x},y}(\partial_{i}(y-f_{n}(\boldsymbol{x}))^{2}
+      \partial_{j}(y-f_{n}(\boldsymbol{x}))^{2})\\
+    H_{ij}
+    &=
+      E_{\boldsymbol{x},y}(\partial_{i}\partial_{i}
+      (y-f_{n}(\boldsymbol{x}))^{2}).
+  \end{align}
+
+*** Error Bound
+****                                                           :B_theorem:
+:PROPERTIES:
+:BEAMER_env: theorem
+:END:
+The squared error of three-layered perceptron
+is asymptotically bound by
+\begin{align}
+  \|y-f_{n,t}\|^{2}
+  &\leq \sigma^{2}+\frac{2\|T\|_{L^{1}}^2}{n}\\
+  &\qquad+\frac{1}{t}\left(\frac{\mathrm{tr} GH^{-1}}{2}+
+    \sqrt{\frac{\mathrm{tr} GH^{-1}GH^{-1}}{2\delta}}\right)\\
+  &\qquad+o\left(\frac{1}{n}\right)+
+    o\left(\frac{1}{t}\right)
+\end{align}
+with probability \(1-\delta\).
+
+* COMMENT Numerical Examples
+
+* Conclusion
+*** Concluding Remarks
+we have investigated
+- integral representation of three-layered perceptron
+- approximation bounds of some function spaces
+
+further works are done on
+- specifying classes of activation functions
+- investigating reproducing kernel Hilbert spaces
+
+
+*** References
+:PROPERTIES:
+:BEAMER_opt: allowframebreaks
+:END:
+\printbibliography[heading=none]
+
+
+* COMMENT File Local Variables
+# Local Variables:
+# End:
+    
